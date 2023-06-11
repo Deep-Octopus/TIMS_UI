@@ -41,3 +41,7 @@ export function initClazz(teacherId,auth){
 export function changeUserPwd(form){
     return request.post(`/changePwd`,form)
 }
+
+export function searchApi(data,auth){
+    return request.post(`/api/${auth}/query`,data)
+}

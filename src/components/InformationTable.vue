@@ -163,6 +163,12 @@ export default {
     },
     doLook(row){
       if (this.$store.state.page.tableCurrentEntity === 'clazz'){
+        // 暂存
+        this.$store.state.page.temp.fields = this.$store.state.page.fields
+        this.$store.state.page.temp.rules = this.$store.state.page.rules
+        this.$store.state.page.temp.form = this.$store.state.page.form
+        this.$store.state.page.temp.allData = this.$store.state.page.allData
+
         // 查看班级
         this.$store.state.page.tableCurrentEntity = 'student'
         this.$store.dispatch('page/getTableConfig')

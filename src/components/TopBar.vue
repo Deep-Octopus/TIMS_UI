@@ -11,10 +11,22 @@
       <el-tooltip v-if="returnShow" class="item" effect="dark" content="返回" placement="top">
         <i v-if="returnShow" class="iconfont" style="color: red" @click="goReturn">&#xe669;</i>
       </el-tooltip>
+<!--      <el-input-->
+<!--          v-if="$store.state.page.tableCurrentEntity!=='student' && currentShow!=='calander'"-->
+<!--          placeholder="请输入搜索内容"-->
+<!--          v-model="searchContent"-->
+<!--          style="width: 300px;margin-right: 15px;margin-top: -5px"-->
+<!--          class="input-with-select">-->
+<!--        <el-select v-model="searchType" slot="prepend" placeholder="请选择">-->
+<!--          <el-option v-for="(field, index) in $store.state.page.fields" :label="field.label" :value="field.prop" :key="index"></el-option>-->
+<!--        </el-select>-->
+<!--        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>-->
+<!--      </el-input>-->
       <el-tooltip v-if="$store.state.page.tableCurrentEntity!=='student' && currentShow!=='calander'" class="item"
                   effect="dark" content="日历" placement="top">
         <i class="iconfont " @click="changeShow('calander')">&#xe65f;</i>
       </el-tooltip>
+
       <el-tooltip v-if="currentShow!=='table'" class="item" effect="dark" content="信息表" placement="top">
         <i class="iconfont " @click="changeShow('table')">&#xe758;</i>
       </el-tooltip>
@@ -64,6 +76,8 @@ export default {
   data() {
     return {
       infoVisible: false,
+      searchType:'',
+      searchContent:'',
     }
   },
   computed: {
@@ -133,9 +147,17 @@ export default {
     },
     goReturn() {
       this.$store.state.page.returnShow = false
+      this.searchType = ''
+      // 恢复数据
+      this.$store.state.page.form = this.$store.state.page.temp.form
+      this.$store.state.page.rules = this.$store.state.page.temp.rules
+      this.$store.state.page.fields = this.$store.state.page.temp.fields
+      this.$store.state.page.allData = this.$store.state.page.temp.allData
+
+      // this.$router.go("/home")
       this.$store.state.page.tableCurrentEntity = 'clazz'
-      this.$store.dispatch('page/getTableConfig')
-      this.$store.dispatch("page/init")
+      // this.$store.dispatch('page/getTableConfig')
+      // this.$store.dispatch("page/init")
     },
     changeTableTarget() {
       this.$store.state.page.tableCurrentEntity = this.$store.state.page.tableCurrentEntity === 'clazz' ? "teacher" : "clazz"
@@ -144,6 +166,22 @@ export default {
     },
     changeShow(show) {
       this.$store.state.page.currentShow = show
+    },
+    search(){
+      if (this.searchType ===''){
+        message.warning("请先选择搜索属性")
+        return
+      }
+      if (this.searchContent === ''){
+        message.warning("请输入搜索内容")
+        return;
+      }
+
+      this.$store.dispatch("page/search",{
+        searchType: this.searchType,
+        searchContent: this.searchContent
+      })
+      this.$store.state.page.returnShow = false
     }
   }
 }

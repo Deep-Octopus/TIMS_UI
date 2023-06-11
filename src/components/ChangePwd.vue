@@ -18,7 +18,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="change-password-footer">
-        <el-button @click="$store.state.page.changePwdShow=false">取消</el-button>
+        <el-button @click="handleClose">取消</el-button>
         <el-button type="primary" @click="handleSubmit">确定</el-button>
       </div>
     </el-dialog>
@@ -102,6 +102,9 @@ export default {
       this.$confirm('确认关闭？')
           .then(() => {
             this.$store.state.page.changePwdShow = false
+            this.oldPassword = ''
+            this.newPassword = ''
+            this.confirmPassword = ''
             done();
           })
           .catch(() => {});

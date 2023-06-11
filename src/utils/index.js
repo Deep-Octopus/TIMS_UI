@@ -1,3 +1,6 @@
+import store from "@/store";
+import message from "@/utils/message";
+
 /**
  * 读取UTF8编码的字节，并专为Unicode的字符串
  * @param arr
@@ -56,37 +59,80 @@ export function formatDate(date, format) {
 
     return formattedDate;
 }
+export function parseJson(jsonStr){
+    return JSON.parse(jsonStr, (k, v) => {
+        try{
+            // 将正则字符串转成正则对象
+            if (eval(v) instanceof RegExp) {
+                return eval(v);
+            }
+        }catch(e){
+            // nothing
+        }
 
+        return v;
+    });
+}
+
+/**
+ * json对象转json字符串
+ * @param { Object } json json对象
+ */
+export function stringifyJson(json){
+    return JSON.stringify(json, (k, v) => {
+        // 将正则对象转换为正则字符串
+        if(v instanceof RegExp){
+            return v.toString();
+        }
+
+        return v;
+    });
+}
 // 保存table配置
-export function handleSave(tableTarget = "student", config = {fields: [
-        {type: 'input', label: '学号', prop: 'id', placeholder: '请输入学号', disabled: false},
-        {type: 'input', label: '姓名', prop: 'name', placeholder: '请输入姓名', disabled: false},
-        {type: 'radio', label: '性别', prop: 'gender', options: ['男', '女'], disabled: false},
-        {type: 'input', label: '电话号码', prop: 'phoneNumber', placeholder: "请输入电话号码", disabled: false},
-    ],
-    rules: {
-        id: [
-            {required: true, message: '请输入学号', trigger: 'blur'},
-            {pattern: /^[0-9]{11}$/, message: "必须是11位数字", trigger: 'blur'}
-        ],
-        name: [
-            {required: true, message: '请输入姓名', trigger: 'blur'},
-            {pattern: /^[\u4E00-\u9FA5A-Za-z]+$/, message: '只能输入中文和英文', trigger: 'blur'}
-        ],
-        phoneNumber: [
-            {required: true, message: '请输入电话号码', trigger: 'blur'},
-            {pattern: /^[0-9]{11}$/, message: "必须是11位数字", trigger: 'blur'}
-        ]
-    },
-    form: {
-        id: '',
-        name: '',
-        gender: '',
-        phoneNumber: '',
-    }
-}) {
-    this.$store.dispatch("page/saveTableConfig", {
+export function handleSave(tableTarget = "student", config = {}) {
+    store.dispatch("page/saveTableConfig", {
         tableTarget: tableTarget,
-        configValue: JSON.stringify(config)
+        configValue: stringifyJson(config)
     })
+}
+export function save(){
+    store.dispatch("page/saveTableConfig", {
+        tableTarget: "clazz",
+        configValue: stringifyJson({fields: [
+                {type: 'input', label: '班级号', prop: 'id', placeholder: '请输入班级号', disabled: false},
+                {
+                    type: "input",
+                    label: "班主任教工号",
+                    prop: "teacherId",
+                    placeholder: "请输入班主任教工号",
+                    disabled: false
+                },
+                {
+                    type: "select",
+                    label: "所属学院",
+                    prop: "department",
+                    options: [
+                        "人工智能学院"
+                    ],
+                    disabled: false
+                }
+            ],
+            rules: {
+                id: [
+                    {required: true, message: '请输入班级号', trigger: 'blur'},
+                    {pattern: /^[0-9]{8,10}$/, message: "8-10 位数字", trigger: 'blur'}
+                ],
+                teacherId:[
+                    {required: true, message: "请输入班主任教工号", trigger: "blur"},
+                    {pattern: /^[0-9]{3,8}$/, message: "3-8位数字", trigger: "blur"}
+                ]
+            },
+            form: {
+                id: "",
+                teacherId: "",
+                department: ""
+            }})
+    })
+// handleSave("student",)
+    message.success("保存成功")
 }

@@ -3,8 +3,8 @@
       :title="title"
       :visible.sync="dialogVisible"
       :append-to-body="true"
-      :close-on-click-modal="true"
-      :close-on-press-escape="true"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
       :show-close="false"
       :lock-scroll="true"
   >

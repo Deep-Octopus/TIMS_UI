@@ -4,11 +4,12 @@ import {
     getStudents,
     initClazz,
     initEntity,
-    multipleDeleteEntity,
+    multipleDeleteEntity, searchApi,
     updateEntity
 } from "@/api/user";
 import message from "@/utils/message";
 import request from "@/utils/request";
+import {parseJson} from "@/utils";
 
 const state = {
     currentShow:'table',
@@ -48,14 +49,20 @@ const state = {
 
     returnShow: false,
     returnKey: 0,
-    changePwdShow:false
+    changePwdShow:false,
+    temp:{
+        form:{},
+        rules:{},
+        fields:{},
+        allData:[]
+    }
     // addStatus:false,
 }
 
 
 const mutations = {
     CONFIG(state, data) {
-        let config = JSON.parse(data)
+        let config = parseJson(data)
         state.form = config.form
         state.fields = config.fields
         state.rules = config.rules
@@ -89,6 +96,9 @@ const mutations = {
         message.success("更新成功")
         state.dialogVisible = false
         actions.resetForm()
+    },
+    SEARCH_SUCCESS(state, data) {
+        state.allData = data
     }
 }
 
@@ -188,6 +198,15 @@ const actions = {
             }
         }).catch(err => {
             console.error(err)
+        })
+    },
+    search(context,data) {
+        searchApi({...data},state.tableCurrentEntity).then(resp => {
+            if (resp.status === 200) {
+                console.log(resp)
+                context.commit("SEARCH_SUCCESS",[...resp.data])
+            }
+            message.error(resp.message)
         })
     }
 }
